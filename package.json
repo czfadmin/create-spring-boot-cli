@@ -1,0 +1,47 @@
+{
+  "name": "create-spring-boot-cli",
+  "version": "1.0.1",
+  "description": "Create a Spring boot project using cli",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development node ./scripts/build.mjs",
+    "prod": "cross-env NODE_ENV=production node ./scripts/build.mjs"
+  },
+  "bin": {
+    "create-spring-boot-cli": "./bin/index.cjs",
+    "csbc": "./bin/index.cjs"
+  },
+  "keywords": [
+    "spring boot cli",
+    "cli",
+    "spring boot"
+  ],
+  "private": false,
+  "author": "czfadmin",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.1.2",
+    "cli-cursor": "^4.0.0",
+    "cli-progress": "^3.11.2",
+    "cli-table3": "^0.6.3",
+    "commander": "^9.4.1",
+    "execa": "^6.1.0",
+    "figures": "^5.0.0",
+    "fs-extra": "^10.1.0",
+    "inquirer": "^9.1.4",
+    "lodash": "^4.17.21",
+    "node-fetch": "^3.2.10",
+    "rxjs": "^7.5.7"
+  },
+  "devDependencies": {
+    "@types/cli-progress": "^3.11.0",
+    "@types/fs-extra": "^9.0.13",
+    "@types/inquirer": "^9.0.3",
+    "@types/lodash": "^4.14.188",
+    "cross-env": "^7.0.3",
+    "esbuild": "^0.15.13",
+    "esbuild-plugin-lodash": "^1.2.0",
+    "esbuild-plugin-time": "^1.0.0",
+    "ts-node": "^10.9.1"
+  },
+  "type": "module"
+}
