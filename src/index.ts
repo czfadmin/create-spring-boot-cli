@@ -144,19 +144,19 @@ async function bootstrap() {
       utils.info(tarChildProcess.stdout);
       utils.success("🎉 File decompressed successfully! 🎉");
       fs.unlinkSync(zipFile);
-      if (projectPath === currentLocation) {
-        if (needGit) {
-          await execa("git", ["init", "."]);
-        }
-      } else {
-        if (!fs.existsSync(projectPath)) {
-          fs.mkdirSync(projectPath);
-        }
-        await execa("cd", [projectPath]);
-        if (needGit) {
-          await execa("git", ["init", "."]);
-        }
-      }
+    //   if (projectPath === currentLocation) {
+    //     if (needGit) {
+    //       await execa("git", ["init", "."]);
+    //     }
+    //   } else {
+    //     if (!fs.existsSync(projectPath)) {
+    //       fs.mkdirSync(projectPath);
+    //     }
+    //     await execa("cd", [projectPath]);
+    //     if (needGit) {
+    //       await execa("git", ["init", "."]);
+    //     }
+    //   }
     }
 
     utils.success("\n🎉 Project created successfully,Happy coding! 🎉");

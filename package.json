@@ -1,6 +1,6 @@
 {
   "name": "create-spring-boot-cli",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Create a Spring boot project using cli",
   "scripts": {
     "dev": "cross-env NODE_ENV=development node ./scripts/build.mjs",
@@ -43,5 +43,7 @@
     "esbuild-plugin-time": "^1.0.0",
     "ts-node": "^10.9.1"
   },
-  "type": "module"
+  "type": "module",
+  "homepage": "https://github.com/czfadmin/create-spring-boot-cli/blob/main/README.md",
+  "repository": "https://github.com/czfadmin/create-spring-boot-cli"
 }

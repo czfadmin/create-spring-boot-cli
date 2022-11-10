@@ -20,30 +20,30 @@ export const baseQuz: QuestionCollection<QuestionAnswer> = [
   },
   {
     type: "rawlist",
-    message: "选择Spring boot 构建工具",
+    message: "Please select the Spring boot builder",
     name: "type",
     choices: [
       {
         title: "Gradle",
         value: "gradle-project",
-        description: "使用Gradle 构建Spring boot",
+        description: "Building Spring boot with gradle",
       },
       {
         title: "Maven",
         value: "maven-project",
-        description: "使用Maven 构建Spring boot",
+        description: "Building Spring boot with Maven",
       },
     ],
   },
   {
     type: "text",
-    message: "填写Group",
+    message: "Please input group",
     name: "groupId",
     default: "com.example",
   },
   {
     type: "text",
-    message: "填写Artifact",
+    message: "Please input artifact",
     name: "artifactId",
     default: "demo",
   },
@@ -65,7 +65,7 @@ export const projectOptsQuz: QuestionCollection<QuestionAnswer> = [
   },
   {
     type: "rawlist",
-    message: "选择Spring boot 开发语言",
+    message: "Select development language",
     name: "language",
     choices: [],
   },
@@ -114,10 +114,10 @@ export const projectOptsQuz: QuestionCollection<QuestionAnswer> = [
     },
   },
 
-  {
-    type: "confirm",
-    message: "Create git repository?",
-    name: "git",
-    default: false,
-  },
+//   {
+//     type: "confirm",
+//     message: "Create git repository?",
+//     name: "git",
+//     default: false,
+//   },
 ];

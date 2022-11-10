@@ -16,11 +16,12 @@ yarn add --global create-spring-boot-cli
 ```bash
 csbc
 ```
-
 ## 效果
+![picture 5](./images/760bd794a6d361d82a086079b494736af354ea8aee11610dc9e0653793e7c2a9.png)  
+![picture 6](./images/e2921a10199f28b8ccac58411d32b3d0b14b15a4106b4a2de58866fa3ccda546.png)  
+![picture 7](./images/db101c49334bdecf2adc88b58dea896bd63ea54c75a453acb5196567c422df5d.png)  
 
-![picture 1](./images/1f37e4368538d03ea34ac3a4da771e056e224f8b991eaf63ea6a9f88d415b569.png)
 
-![picture 2](./images/571d4d06d42c9cb0cf5a2c1b09883bcd9f037a35612eb800f60642d777812ccb.png)
-
-![picture 4](./images/b5d4a2300e8d2188e2eb3df49a4599409a9b06c9879892a83e4f1fa512158f75.png)
+## TODO
+- 添加中文
+- More
