@@ -26,7 +26,6 @@ const esbuildConfig = {
   incremental: isWatch, // 增量构建
   banner: {
     js: `// Copyright (c) 2022 abchen\n//\n// This software is released under the MIT License.\n// https://opensource.org/licenses/MIT`,
-    css: "red",
   },
   color: true,
   sourcemap: isWatch ? "inline" : false,

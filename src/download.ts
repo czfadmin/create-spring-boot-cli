@@ -5,7 +5,8 @@ import { promisify } from "node:util";
 import { pipeline } from "node:stream";
 import path from "path";
 import utils from "./util";
-import { mirrorChoices } from "./constants";
+import { baseMirrorChoices } from "./mirrors";
+import { metadatasSavePath } from "./constants";
 /**
  * 根据配置项下载Demo项目
  */
@@ -49,10 +50,7 @@ export async function downloadProject(answers: any): Promise<boolean> {
     );
     if (isOk) {
       singlebar.stop();
-      await streamPipeline(
-        chunks,
-        fs.createWriteStream(savePath)
-      );
+      await streamPipeline(chunks, fs.createWriteStream(savePath));
       utils.success("\n🎉 File download succeeded!");
       return true;
     }
@@ -84,38 +82,29 @@ export async function download(
 /**
  * 下载Spring boot的metadata 数据
  */
-export async function downloadMetadata(
-  metadatasPath: string
-): Promise<any | null> {
-  // 判断是否下载过metadata,如果存在使用缓存,反之重新下载
-  if (fs.existsSync(metadatasPath)) {
-    const metadatas = fs.readJSONSync(metadatasPath);
-    utils.success("😄 Use previously saved cached data!");
-    return metadatas;
-  } else {
-    try {
-      const result = await Promise.all(
-        mirrorChoices.map((mirrorChoice) => {
-          return (async () => {
-            const response = await download(mirrorChoice.metaClient);
-            return {
-              name: mirrorChoice.value,
-              data: await response.json(),
-            };
-          })();
-        })
-      );
-      fs.writeJsonSync(metadatasPath, {
-        metadatas: result,
-      });
-      utils.success("Write file successfully: " + metadatasPath);
-      return {
-        metadatas: result,
-      };
-    } catch (error) {
-      utils.error("Download metadata failed: " + error.message);
-      throw error;
-    }
+export async function downloadMetadata(): Promise<any | null> {
+  try {
+    const result = await Promise.all(
+      baseMirrorChoices.map((mirrorChoice) => {
+        return (async () => {
+          const response = await download(mirrorChoice.metaClient);
+          return {
+            name: mirrorChoice.value,
+            data: await response.json(),
+          };
+        })();
+      })
+    );
+    fs.writeJsonSync(metadatasSavePath, {
+      metadatas: result,
+    });
+    utils.success("🎉 Download Successfully! Path: " + metadatasSavePath);
+    return {
+      metadatas: result,
+    };
+  } catch (error) {
+    utils.error("Download metadata failed: " + error.message);
+    throw error;
   }
 }
 
@@ -130,8 +119,8 @@ export async function downloadMetadata(
  * @returns
  */
 export function buildDownloadUrl(answers: any): string {
-  let mirror = mirrorChoices.filter((it) => it.value == answers["mirror"]);
-  let baseURL = mirrorChoices[0].url;
+  let mirror = baseMirrorChoices.filter((it) => it.value == answers["mirror"]);
+  let baseURL = baseMirrorChoices[0].url;
   let needFields = [
     "type",
     "language",
@@ -164,6 +153,23 @@ export function buildDownloadUrl(answers: any): string {
   }
   utils.info(`🔗 下载链接: ${url}\n`);
   return url;
+}
+
+export async function getMetadataContent() {
+  let metadatas: any;
+  try {
+    // 判断是否下载过metadata,如果存在使用缓存,反之重新下载
+    if (fs.existsSync(metadatasSavePath)) {
+      metadatas = fs.readJSONSync(metadatasSavePath);
+      utils.success("🎉 使用缓存数据!");
+    } else {
+      metadatas = await downloadMetadata();
+    }
+    return metadatas;
+  } catch (error) {
+    utils.error(error.message);
+    process.exit();
+  }
 }
 
 export function decomposeFolder() {}

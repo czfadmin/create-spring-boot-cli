@@ -1,6 +1,12 @@
 import chalk from "chalk";
-import { execaSync } from "execa";
+import { execa, execaSync } from "execa";
+import fs from 'fs-extra'
 import Table from "cli-table3";
+import inquirer from "inquirer";
+
+import { downloadProject } from "./download";
+import path from "path";
+
 const log = console.log;
 function info(message: string) {
   return log(chalk.blue(message));
@@ -30,7 +36,7 @@ export function getJDKInfo() {
   return javaVer;
 }
 
-export function outputTable(data: any) {
+export function outputAnswerTable(data: any) {
   const dataset: any[] = Object.entries(data);
   const head = ["", "Content"];
   const table = new Table({
@@ -55,10 +61,59 @@ export function outputTable(data: any) {
   }
 }
 
+ async function prompt(quz: any): Promise<any> {
+  return inquirer.prompt(quz).catch((err) => {
+    error(err.message);
+    process.exit(-1);
+  });
+}
+
+
+async function generateProject(answers: any) {
+    try {
+      // 将数据输出
+      outputAnswerTable(answers);
+      const currentLocation = process.cwd();
+      const savePath = answers["location"];
+      const projectPath = `${answers["location"]}/${answers["artifactId"]}`;
+      const needGit = answers["git"];
+  
+      // 下载Demo文件
+      if (await downloadProject(answers)) {
+        const zipFile = path.resolve(
+          currentLocation,
+          `${answers["artifactId"]}.zip`
+        );
+  
+        const tarChildProcess = await execa(
+          "tar",
+          ["-C", savePath, "-xvzf", zipFile],
+          {}
+        );
+        info(tarChildProcess.stdout);
+        success("🎉 File decompressed successfully! 🎉");
+        fs.unlinkSync(zipFile);
+        if (needGit) {
+          await execa("cd", [projectPath]);
+          await execa("git", ["init", "."]);
+          await execa("cd", [currentLocation]);
+        }
+      }
+  
+      success("\n🎉 Project created successfully,Happy coding! 🎉");
+    } catch (error) {
+      error(error.stack);
+      process.exit(0);
+    } finally {
+      process.exit(0);
+    }
+  }
 export default {
   info,
   warn,
   error,
   success,
   getJDKInfo,
+  prompt,
+  generateProject
 };

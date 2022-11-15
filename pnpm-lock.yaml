@@ -5,6 +5,7 @@ specifiers:
   '@types/fs-extra': ^9.0.13
   '@types/inquirer': ^9.0.3
   '@types/lodash': ^4.14.188
+  '@types/node': ^18.11.9
   chalk: ^5.1.2
   cli-cursor: ^4.0.0
   cli-progress: ^3.11.2
@@ -42,11 +43,12 @@ devDependencies:
   '@types/fs-extra': registry.npmmirror.com/@types/fs-extra/9.0.13
   '@types/inquirer': registry.npmmirror.com/@types/inquirer/9.0.3
   '@types/lodash': registry.npmmirror.com/@types/lodash/4.14.188
+  '@types/node': registry.npmmirror.com/@types/node/18.11.9
   cross-env: registry.npmmirror.com/cross-env/7.0.3
   esbuild: registry.npmmirror.com/esbuild/0.15.13
   esbuild-plugin-lodash: registry.npmmirror.com/esbuild-plugin-lodash/1.2.0
   esbuild-plugin-time: registry.npmmirror.com/esbuild-plugin-time/1.0.0
-  ts-node: registry.npmmirror.com/ts-node/10.9.1
+  ts-node: registry.npmmirror.com/ts-node/10.9.1_@types+node@18.11.9
 
 packages:
 
@@ -1158,8 +1160,9 @@ packages:
       os-tmpdir: registry.npmmirror.com/os-tmpdir/1.0.2
     dev: false
 
-  registry.npmmirror.com/ts-node/10.9.1:
+  registry.npmmirror.com/ts-node/10.9.1_@types+node@18.11.9:
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/ts-node/-/ts-node-10.9.1.tgz}
+    id: registry.npmmirror.com/ts-node/10.9.1
     name: ts-node
     version: 10.9.1
     hasBin: true
@@ -1179,6 +1182,7 @@ packages:
       '@tsconfig/node12': registry.npmmirror.com/@tsconfig/node12/1.0.11
       '@tsconfig/node14': registry.npmmirror.com/@tsconfig/node14/1.0.3
       '@tsconfig/node16': registry.npmmirror.com/@tsconfig/node16/1.0.3
+      '@types/node': registry.npmmirror.com/@types/node/18.11.9
       acorn: registry.npmmirror.com/acorn/8.8.1
       acorn-walk: registry.npmmirror.com/acorn-walk/8.2.0
       arg: registry.npmmirror.com/arg/4.1.3

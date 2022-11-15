@@ -1,170 +1,163 @@
 #!/usr/bin/env node
 import path from "path";
-import inquirer, { Answers, DistinctQuestion } from "inquirer";
+import inquirer from "inquirer";
 import fs from "fs-extra";
-import { execa } from "execa";
+import { createCommand } from "commander";
+import pkg from "../package.json";
 import TreePrompt from "./inquirer-tree-prompt";
-import utils, { outputTable } from "./util";
-import { downloadMetadata, downloadProject } from "./download";
-import { projectOptsQuz, baseQuz } from "./question";
 
-type MetadataType = { name: string; data: any };
-
-/**
- * 构建 Prompt的数据
- * @param metadatas: springboot 的metadata 数据
- */
-function buildPromptObjects(metadatas?: MetadataType[]): any[] | null {
-  if (!metadatas) {
-    return null;
+import utils from "./util";
+import { downloadMetadata, getMetadataContent } from "./download";
+import { buildBasicQuz, addTemplateQuz } from "./question";
+import { homePath, metadatasSavePath } from "./constants";
+import {
+  createTemplate,
+  editTemplate,
+  listAllTemplates,
+  outputTemplatesTable,
+  removeTemplate,
+  saveAsTemplate,
+  useTemplate,
+} from "./templates";
+import {
+  addMirror,
+  editMirror,
+  listAllMirrors,
+  removeMirror,
+  restoreMirrors,
+} from "./mirrors";
+import { clearCache } from "./cache";
+inquirer.registerPrompt("tree", TreePrompt);
+async function generate() {
+  let metadatas = await getMetadataContent();
+  let quz = buildBasicQuz(metadatas["metadatas"]);
+  quz.push({
+    type: "confirm",
+    name: "saveAsTemplate",
+    message: "是否要保存模版?",
+    default: false,
+  });
+  addTemplateQuz(quz);
+  if (quz == null) {
+    process.exit(-1);
   }
-  // 调整对应的Quz
-  const adjustQuzByQuzName = (name: string, answers: any[]) => {
-    if (metadatas.length > 0) {
-      let metadata: any = metadatas.filter(
-        (it: any) => it.name == answers["mirror"]
-      );
-      if (!metadata) {
-        metadata = metadatas[0][0].data || [];
-      } else {
-        metadata = metadata[0].data;
-      }
-      let metaVersion = metadata[name];
-      //   let defaultSelected = metaVersion["default"];
-      return (metaVersion["values"] as any[]).map((item: any) => ({
-        title: item.name,
-        value: item.id,
-      }));
-    }
-    return [];
-  };
-
-  if (metadatas instanceof Array) {
-    // 调整 projectQuz
-    let newProjectQuz = (projectOptsQuz as ReadonlyArray<DistinctQuestion>).map(
-      (quz: any) => {
-        // 待调整的Quz
-        let toAdjustQuz = [
-          "bootVersion",
-          "javaVersion",
-          "language",
-          "packaging",
-        ];
-        if (toAdjustQuz.includes(quz.name as string)) {
-          return {
-            ...quz,
-            choices: (answers) => {
-              return adjustQuzByQuzName(quz.name as string, answers);
-            },
-          };
-        }
-        return quz;
-      }
-    );
-
-    let depsQuz: any = {
-      type: "tree",
-      name: "dependencies",
-      message: "Select the dependency you want to add",
-      multiple: true,
-      validate: (value) => !!value,
-      tree: (answers: Answers) => {
-        let metadata: any = metadatas.filter(
-          (it: any) => it.name == answers["mirror"]
-        );
-        if (!metadata) {
-          metadata = metadatas[0][0].data || [];
-        } else {
-          metadata = metadata[0].data;
-        }
-        let dependencies = metadata["dependencies"] as {
-          type: string;
-          values: any[];
-        };
-        if (!dependencies || dependencies.values.length < 0) {
-          return [];
-        }
-        let choices = dependencies.values.map((item) => ({
-          value: "",
-          name: item.name,
-          children: item.values.map((it) => ({
-            name: it.name,
-            value: it.id,
-          })),
-        }));
-        return choices;
-      },
-    };
-
-    return [...(baseQuz as any[]), ...newProjectQuz, depsQuz];
+  const answers = await utils.prompt(quz);
+  if (answers["saveAsTemplate"]) {
+    saveAsTemplate(answers);
   }
-  return null;
+  await utils.generateProject(answers);
 }
 
 async function bootstrap() {
-  // 下载METEDATA
-  let metadatas;
-  try {
-    // 可能会出现超时现象
-    const homePath = process.env["HOME"] || `/Users/${process.env["USER"]}`;
-    const metadatasSavePath = path.resolve(homePath, ".metadatas.json");
-    metadatas = await downloadMetadata(metadatasSavePath);
-  } catch (error) {
-    console.error(error.message);
-  }
+  const program = createCommand();
+  program
+    .name("create-spring-boot-cli")
+    .version(pkg.version, "-v, --version", "版本信息");
 
-  try {
-    const quz = buildPromptObjects(metadatas["metadatas"]);
-    if (quz == null) {
-      process.exit(-1);
-    }
-    inquirer.registerPrompt("tree", TreePrompt);
-    const answers = await inquirer.prompt(quz).catch((err) => {
-      utils.error(err.message);
-      process.exit(-1);
+  program
+    .command("template")
+    .addHelpText("before", "用户保存模版管理")
+    .option("-c,--create", "创建模版")
+    .option("-r,--remove [filename]", "删除指定的模版")
+    .option("-e,--edit [filename]", "编辑模版")
+    .option("-l,--list", "列出之前保存的模版")
+    .option("-u,--use", "选择模版创建项目")
+    .action(async (options, command) => {
+      let templates = listAllTemplates();
+      if (options.create) {
+        createTemplate(templates);
+      } else if (options.list) {
+        if (templates.length == 0) {
+          utils.error("未保存任何模版,请创建模版");
+          return;
+        }
+        outputTemplatesTable(templates);
+      } else if (options.remove) {
+        removeTemplate(templates, options.remove);
+      } else if (options.edit) {
+        editTemplate(templates, options.edit);
+      } else if (options.use) {
+        useTemplate(templates, options);
+      } else {
+        outputTemplatesTable(templates);
+      }
     });
 
-    outputTable(answers);
-    const currentLocation = process.cwd();
-    const projectPath = answers["location"];
-    const needGit = answers["git"];
+  program
+    .command("cache")
+    .addHelpText("before", "缓存管理")
+    .option("-c,--clear", "清除缓存")
+    .option("-d,--download", "下载镜像数据")
+    .option("-u,--update", "更新缓存")
+    .action(async (options, command) => {
+      if (options.download) {
+        utils.info("开始下载镜像数据");
+        if (!fs.existsSync(path.resolve(homePath, ".csbc"))) {
+          fs.mkdirSync(path.resolve(homePath, ".csbc"));
+        }
+        await downloadMetadata();
+      }
 
-    // 下载Demo文件
-    if (await downloadProject(answers)) {
-      const zipFile = path.resolve(
-        currentLocation,
-        `${answers["artifactId"]}.zip`
-      );
+      if (options.clear) {
+        utils.info("开始清除之前下载的数据");
+        clearCache(metadatasSavePath);
+      }
 
-      const tarChildProcess = await execa(
-        "tar",
-        ["-C", projectPath, "-xvzf", zipFile],
-        {}
-      );
-      utils.info(tarChildProcess.stdout);
-      utils.success("🎉 File decompressed successfully! 🎉");
-      fs.unlinkSync(zipFile);
-    //   if (projectPath === currentLocation) {
-    //     if (needGit) {
-    //       await execa("git", ["init", "."]);
-    //     }
-    //   } else {
-    //     if (!fs.existsSync(projectPath)) {
-    //       fs.mkdirSync(projectPath);
-    //     }
-    //     await execa("cd", [projectPath]);
-    //     if (needGit) {
-    //       await execa("git", ["init", "."]);
-    //     }
-    //   }
-    }
+      if (options.update) {
+        utils.info("开始下载并更新数据");
+        await downloadMetadata();
+      }
+    });
 
-    utils.success("\n🎉 Project created successfully,Happy coding! 🎉");
-  } catch (error) {
-    utils.error(error.stack);
-    process.exit(0);
-  } finally {
-    process.exit(0);
+  program
+    .command("mirror")
+    .addHelpText("before", "镜像源管理")
+    .option("-a,--add", "新增镜像源")
+    .option("-e,--edit", "编辑镜像源")
+    .option("-r,--remove <mirrorName>", "删除镜像源")
+    .option("-l,--list", "列出所有的镜像源")
+    .option("-re,--restore", "还原镜像源")
+    .action((options, command) => {
+      if (options.list) {
+        listAllMirrors();
+      }
+
+      if (options.add) {
+        addMirror();
+      }
+
+      if (options.edit) {
+        editMirror();
+      }
+
+      if (options.remove) {
+        const mirrors = options.remove;
+        const mirrorArr = mirrors.split(",");
+        removeMirror(mirrorArr);
+      }
+      if (options.restore) {
+        restoreMirrors();
+      }
+    });
+
+  //   program
+  //     .command("config")
+  //     .addHelpText("before", "配置CLI")
+  //     .option("-l,--language [language]", "配置CLI语言")
+  //     .action((options, command) => {
+  //       if (options.language) {
+  //         configAppLanguage(options.language);
+  //       }
+  //     });
+
+  program.command("create", "创建Spring boot 项目").action(async () => {
+    await generate();
+  });
+
+  if (process.argv.length > 2) {
+    program.parse(process.argv);
+  } else {
+    await generate();
   }
 }
 

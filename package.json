@@ -1,6 +1,6 @@
 {
   "name": "create-spring-boot-cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Create a Spring boot project using cli",
   "scripts": {
     "dev": "cross-env NODE_ENV=development node ./scripts/build.mjs",
@@ -37,6 +37,7 @@
     "@types/fs-extra": "^9.0.13",
     "@types/inquirer": "^9.0.3",
     "@types/lodash": "^4.14.188",
+    "@types/node": "^18.11.9",
     "cross-env": "^7.0.3",
     "esbuild": "^0.15.13",
     "esbuild-plugin-lodash": "^1.2.0",
