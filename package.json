@@ -1,6 +1,6 @@
 {
   "name": "create-spring-boot-cli",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Create a Spring boot project using cli",
   "scripts": {
     "dev": "cross-env NODE_ENV=development node ./scripts/build.mjs",

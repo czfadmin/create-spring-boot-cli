@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs-extra";
 import Table from "cli-table3";
 import utils from "./util";
-import { appPath, metadatasSavePath, templatesDir } from "./constants";
+import { templatesDir } from "./constants";
 import { TemplateInfoType } from "./types";
 import { getMetadataContent } from "./download";
 import {

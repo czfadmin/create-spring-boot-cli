@@ -5,6 +5,6 @@ import utils from "./util";
 export async function clearCache(savePath: string) {
   if (fs.existsSync(savePath)) {
     fs.unlinkSync(savePath);
-    utils.success(i18n.get("config.clear.success"));
+    utils.success("清除缓存成功");
   }
 }

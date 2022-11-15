@@ -1,6 +1,5 @@
 import fs from "fs-extra";
 import { configPath } from "./constants";
-import i18n from "./i18n";
 import utils from "./util";
 
 export function loadConfig() {
@@ -26,7 +25,7 @@ export async function configAppLanguage(lang: string | boolean) {
     const quz = [
       {
         type: "rawlist",
-        message: i18n.get("config.selectedLang"),
+        message:"请选择语言",
         name: "language",
         default: "zh_CN",
         choices: (answers) => {
@@ -45,13 +44,13 @@ export async function configAppLanguage(lang: string | boolean) {
     ];
     const answers = await utils.prompt(quz);
     updateConfig("lang", answers["language"]);
-    utils.success(i18n.get("config.changeLangSuccess"));
+    utils.success("切换语言成功");
   } else {
     if (lang == "zh_CN" || lang == "en_US") {
       updateConfig("lang", lang);
-      utils.success(i18n.get("config.changeLangSuccess"));
+      utils.success("切换语言成功");
     } else {
-      utils.error(i18n.get("config.supportLang"));
+      utils.error("暂不支持该语言,目前支持的语言有:中文(zh_CN), 英文(en_US)");
     }
   }
 }

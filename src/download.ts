@@ -51,7 +51,7 @@ export async function downloadProject(answers: any): Promise<boolean> {
     if (isOk) {
       singlebar.stop();
       await streamPipeline(chunks, fs.createWriteStream(savePath));
-      utils.success("\n🎉 File download succeeded!");
+      utils.success("\n🎉 下载成功!");
       return true;
     }
   }
@@ -98,12 +98,12 @@ export async function downloadMetadata(): Promise<any | null> {
     fs.writeJsonSync(metadatasSavePath, {
       metadatas: result,
     });
-    utils.success("🎉 Download Successfully! Path: " + metadatasSavePath);
+    utils.success("🎉 下载成功! Path: " + metadatasSavePath);
     return {
       metadatas: result,
     };
   } catch (error) {
-    utils.error("Download metadata failed: " + error.message);
+    utils.error("下载失败: " + error.message);
     throw error;
   }
 }

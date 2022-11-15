@@ -25,7 +25,7 @@ export const baseQuz: QuestionCollection<QuestionAnswer> = [
     type: "text",
     name: "description",
     message: "项目描述",
-    default: "Description for Spring boot",
+    default: "Springboot 项目描述",
   },
   {
     type: "rawlist",
